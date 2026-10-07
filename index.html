@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Interactive T-x-y and P-x-y diagrams for methanol-water vapor-liquid equilibrium with tie line and lever rule.">
-<title>Methanol–Water VLE Diagrams</title>
+<meta name="description" content="Interactive T-x-y and P-x-y diagrams for binary vapor-liquid equilibrium with tie line and lever rule. Loads Aspen Plus binary analysis results.">
+<title>Binary VLE Diagrams</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
@@ -114,11 +114,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 .seg {
   display: inline-flex;
+  flex-wrap: wrap;
   border: 1px solid var(--rule);
   border-radius: 8px;
   padding: 2px;
   gap: 2px;
   background: var(--well);
+  justify-self: start;
 }
 .seg input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
 .seg label {
@@ -135,6 +137,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .seg input:checked + label { background: var(--ink); color: var(--panel); }
 .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 1px; }
 .seg input:disabled + label { opacity: 0.4; cursor: not-allowed; }
+.unit-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .ctl-series { flex: 1 1 260px; max-width: 380px; }
 .series-row { display: flex; align-items: center; gap: 14px; }
@@ -173,6 +176,7 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.74rem;
   color: var(--muted);
   border-radius: 4px;
+  white-space: nowrap;
 }
 .tickbtn:hover { color: var(--ink); }
 .tickbtn[aria-current="true"] { color: var(--ink); font-weight: 500; }
@@ -227,7 +231,6 @@ output.val {
 .tick { stroke: var(--muted); stroke-width: 1; }
 .tl { fill: var(--muted); font-family: var(--font-mono); font-size: 11.5px; font-variant-numeric: tabular-nums; }
 .axt { fill: var(--ink); font-family: var(--font-sans); font-size: 13.5px; }
-.axt-i { font-style: italic; }
 .lens { fill: var(--lens); stroke: none; }
 .bub { fill: none; stroke: var(--liquid); stroke-width: 2.25; stroke-linejoin: round; }
 .dew { fill: none; stroke: var(--vapor); stroke-width: 2.25; stroke-linejoin: round; }
@@ -237,12 +240,12 @@ output.val {
 .region { font-family: var(--font-sans); font-size: 15px; font-weight: 500; }
 .region.liq { fill: var(--liquid); }
 .region.vap { fill: var(--vapor); }
+.az { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.az-label { fill: var(--muted); font-family: var(--font-sans); font-size: 12px; font-style: italic; }
 .dash-liq { stroke: var(--liquid); stroke-width: 1.75; stroke-dasharray: 5 4; fill: none; }
 .dash-vap { stroke: var(--vapor); stroke-width: 1.75; stroke-dasharray: 5 4; fill: none; }
 .pt-liq { fill: var(--panel); stroke: var(--liquid); stroke-width: 2; }
 .pt-vap { fill: var(--panel); stroke: var(--vapor); stroke-width: 2; }
-.axlab-liq { fill: var(--liquid); font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
-.axlab-vap { fill: var(--vapor); font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
 #dot { fill: var(--ink); stroke: var(--panel); stroke-width: 2; cursor: grab; outline: none; }
 #dotRing { fill: none; stroke: var(--focus); stroke-width: 2; opacity: 0; }
 #dot:focus-visible + #dotRing { opacity: 1; }
@@ -324,16 +327,16 @@ output.val {
 .databar .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .btn input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 .btn { position: relative; display: inline-block; }
-#status { flex-basis: 100%; margin: 0; font-size: 0.84rem; }
-#status.err { color: var(--warn); }
-#status:empty { display: none; }
+.msg { flex-basis: 100%; margin: 0; font-size: 0.84rem; }
+#warn { color: var(--warn); }
+.msg:empty { display: none; }
 
 /* Dialogs */
 dialog.dlg {
   border: 1px solid var(--rule);
   border-radius: 12px;
   padding: 0;
-  width: min(680px, calc(100vw - 32px));
+  width: min(700px, calc(100vw - 32px));
   max-height: calc(100vh - 48px);
   background: var(--panel);
   color: var(--ink);
@@ -345,7 +348,7 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 .dlg-x { padding: 2px 10px; font-size: 1.1rem; line-height: 1.2; }
 .dlg p, .dlg li { max-width: 65ch; font-size: 0.93rem; }
 .dlg p { margin: 0; }
-.dlg ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.dlg ul, .dlg ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
 .dlg h3 { margin: 6px 0 0; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .eq {
   font-family: var(--font-mono);
@@ -381,7 +384,7 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Methanol–Water VLE Diagrams</h1>
+      <h1 id="title">Binary VLE Diagrams</h1>
       <p class="sub">T-x-y and P-x-y diagrams drawn from tabulated equilibrium data. Drag the dot to read the tie line.</p>
     </div>
     <nav class="info-btns" aria-label="Help">
@@ -407,16 +410,13 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
           <input type="range" id="seriesSlider" min="0" max="2" step="1" value="0" aria-labelledby="seriesName">
           <div class="ticks" id="seriesTicks"></div>
         </div>
-        <output class="val" id="seriesValue" for="seriesSlider">1 atm</output>
+        <output class="val" id="seriesValue" for="seriesSlider">–</output>
       </div>
     </div>
 
     <div class="ctl">
       <span class="ctl-label" id="lbl-comp">x-axis component</span>
-      <div class="seg" role="radiogroup" aria-labelledby="lbl-comp">
-        <input type="radio" name="comp" id="cp-MeOH" value="MeOH" checked><label for="cp-MeOH">Methanol</label>
-        <input type="radio" name="comp" id="cp-H2O" value="H2O"><label for="cp-H2O">Water</label>
-      </div>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-comp" id="compSeg"></div>
     </div>
 
     <div class="ctl">
@@ -426,12 +426,27 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
         <input type="radio" name="axes" id="ax-one" value="one"><label for="ax-one">Selected series</label>
       </div>
     </div>
+
+    <div class="ctl">
+      <span class="ctl-label" id="lbl-units">Units</span>
+      <div class="unit-row">
+        <div class="seg" role="radiogroup" aria-label="Temperature unit">
+          <input type="radio" name="uT" id="uT-C" value="C" checked><label for="uT-C">°C</label>
+          <input type="radio" name="uT" id="uT-K" value="K"><label for="uT-K">K</label>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Pressure unit">
+          <input type="radio" name="uP" id="uP-bar" value="bar" checked><label for="uP-bar">bar</label>
+          <input type="radio" name="uP" id="uP-atm" value="atm"><label for="uP-atm">atm</label>
+          <input type="radio" name="uP" id="uP-kPa" value="kPa"><label for="uP-kPa">kPa</label>
+        </div>
+      </div>
+    </div>
   </section>
 
   <main class="stage">
     <div class="plot-col">
       <div class="plot-head">
-        <p class="hint" id="hint">Drag the dot or click the plot. Hold <kbd>Shift</kbd> to keep T constant, <kbd>Ctrl</kbd> to keep composition constant.</p>
+        <p class="hint" id="hint">Drag the dot or click the plot.</p>
         <div class="lockrow">
           <span class="ctl-label" id="lbl-lock">Drag</span>
           <div class="seg" role="radiogroup" aria-labelledby="lbl-lock">
@@ -460,15 +475,16 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
       <span class="chip" id="phaseChip" data-phase="two"><i class="l"></i><i class="v"></i><span id="phaseText">Two-phase</span></span>
       <div id="barsBox"><svg id="bars" role="img" aria-label="Liquid and vapor amounts"></svg></div>
       <dl class="kv">
-        <div><dt>Overall, z<sub class="csub">M</sub></dt><dd id="r-z">–</dd></div>
-        <div><dt>Liquid, x<sub class="csub">M</sub></dt><dd id="r-x" class="liq">–</dd></div>
-        <div><dt>Vapor, y<sub class="csub">M</sub></dt><dd id="r-y" class="vap">–</dd></div>
+        <div><dt>Overall, z<sub class="csub">1</sub></dt><dd id="r-z">–</dd></div>
+        <div><dt>Liquid, x<sub class="csub">1</sub></dt><dd id="r-x" class="liq">–</dd></div>
+        <div><dt>Vapor, y<sub class="csub">1</sub></dt><dd id="r-y" class="vap">–</dd></div>
         <div><dt>Liquid amount</dt><dd id="r-L" class="liq">–</dd></div>
         <div><dt>Vapor amount</dt><dd id="r-V" class="vap">–</dd></div>
         <div><dt id="r-vb-l">Bubble point at z</dt><dd id="r-vb">–</dd></div>
         <div><dt id="r-vd-l">Dew point at z</dt><dd id="r-vd">–</dd></div>
+        <div id="r-az-row" hidden><dt>Azeotrope, x<sub class="csub">1</sub></dt><dd id="r-az">–</dd></div>
       </dl>
-      <p class="kv-note">Amounts are per 1 mol of mixture. Subscript <span id="compSubNote">M = methanol</span>.</p>
+      <p class="kv-note">Amounts are per 1 mol of mixture. Subscript <span id="compSubNote">–</span>.</p>
     </aside>
   </main>
 
@@ -476,23 +492,34 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     <div class="src">Data: <b id="dataName">–</b> <span id="dataSummary"></span></div>
     <div class="acts">
       <label class="btn" for="fileInput">Load .xlsx<input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
-      <button type="button" id="restoreBtn" hidden>Restore original data</button>
+      <button type="button" id="restoreBtn" hidden>Restore sample data</button>
     </div>
-    <p id="status" role="status"></p>
+    <p class="msg" id="status" role="status"></p>
+    <p class="msg" id="warn"></p>
   </section>
 </div>
 
 <dialog class="dlg" id="dlg-directions" aria-labelledby="h-directions">
   <div class="dlg-inner">
     <div class="dlg-head"><h2 id="h-directions">Directions</h2><button type="button" class="dlg-x" data-close aria-label="Close">×</button></div>
-    <p>The diagrams show vapor–liquid equilibrium of methanol and water. The <span class="c-liq">blue curve</span> is the bubble-point (saturated liquid) curve and the <span class="c-vap">green curve</span> is the dew-point (saturated vapor) curve. The shaded lens between them is the two-phase region.</p>
+    <p>The diagrams show vapor–liquid equilibrium of a binary mixture. The <span class="c-liq">blue curve</span> is the bubble-point (saturated liquid) curve and the <span class="c-vap">green curve</span> is the dew-point (saturated vapor) curve. The shaded region between them is the two-phase region.</p>
+
+    <h3>Load your own binary system</h3>
+    <ol>
+      <li>In Aspen Plus, run a <b>Binary</b> analysis (Home tab, Analysis group) of type <b>Txy</b> at the pressure(s) you want, and another of type <b>Pxy</b> at the temperature(s) you want.</li>
+      <li>Open the results of each analysis, select the whole results table including the header row (PRES or TEMP, MOLEFRAC …, TOTAL TEMP or TOTAL PRES, …) and the units row, and copy it.</li>
+      <li>Paste the Txy results into one sheet and the Pxy results into a second sheet of the same Excel workbook. Sheet names and the starting cell do not matter. Save the workbook as .xlsx.</li>
+      <li>Click <b>Load .xlsx</b> below the diagram and choose the file. Component names and units are read from the column headers and the units row. A workbook with only a Txy or only a Pxy sheet also works.</li>
+    </ol>
+
+    <h3>Use the diagram</h3>
     <ul>
       <li>Drag the black dot, or click anywhere in the plot to move it there. In the two-phase region a tie line joins the liquid composition x and the vapor composition y at the dot's temperature (T-x-y) or pressure (P-x-y). The bar chart shows the liquid and vapor amounts for 1 mol of mixture.</li>
       <li>Hold <b>Shift</b> while dragging to keep T constant on the T-x-y diagram, or P constant on the P-x-y diagram. Hold <b>Ctrl</b> (<b>⌘</b> on Mac) to keep the overall composition z constant. On a touch screen, use the Drag buttons above the plot instead.</li>
-      <li>The slider picks the pressure for the T-x-y diagram and the temperature for the P-x-y diagram. Only the tabulated values are available; the page does not interpolate between series.</li>
+      <li>The slider picks the pressure for the T-x-y diagram and the temperature for the P-x-y diagram. Only the values in the data are available; the page does not interpolate between them.</li>
+      <li><b>x-axis component</b> chooses which component's mole fraction is plotted. <b>Units</b> switches temperature between °C and K and pressure between bar, atm and kPa.</li>
       <li><b>All series</b> keeps one axis range for every series, so the envelope moves when you change the slider; the other series are drawn in grey. <b>Selected series</b> fits the axes to the current envelope.</li>
       <li>Click the dot (or Tab to it) and use the arrow keys to move it. Hold Shift for larger steps.</li>
-      <li><b>Load .xlsx</b> replaces the data with another export in the same layout. See Details for the columns it reads.</li>
     </ul>
   </div>
 </dialog>
@@ -500,30 +527,25 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 <dialog class="dlg" id="dlg-details" aria-labelledby="h-details">
   <div class="dlg-inner">
     <div class="dlg-head"><h2 id="h-details">Details</h2><button type="button" class="dlg-x" data-close aria-label="Close">×</button></div>
-    <p>No thermodynamic model runs in this page. Every curve and tie line comes from the tabulated data, so the diagrams are only as accurate as the spreadsheet.</p>
+    <p>No thermodynamic model runs in this page. Every curve and tie line comes from the tabulated data, so the diagrams are only as accurate as the data.</p>
     <h3>Curves</h3>
-    <p>For each series the bubble curve joins the tabulated points (x<sub>i</sub>, T<sub>i</sub>) and the dew curve joins (y<sub>i</sub>, T<sub>i</sub>) with straight segments (P in place of T on the P-x-y diagram).</p>
+    <p>For each series the bubble curve joins the tabulated points (x<sub>i</sub>, T<sub>i</sub>) and the dew curve joins (y<sub>i</sub>, T<sub>i</sub>) with straight segments (P in place of T on the P-x-y diagram). x and y are mole fractions of the component on the x-axis.</p>
     <h3>Phase test</h3>
     <p>For a dot at overall composition z and temperature T, the bubble temperature T<sub>bub</sub>(z) and dew temperature T<sub>dew</sub>(z) are interpolated from the two curves. The mixture is liquid if T ≤ T<sub>bub</sub>(z), vapor if T ≥ T<sub>dew</sub>(z), and two-phase in between. On the P-x-y diagram the inequalities reverse: liquid if P ≥ P<sub>bub</sub>(z), vapor if P ≤ P<sub>dew</sub>(z).</p>
     <h3>Tie line</h3>
-    <p>In the two-phase region the page finds the two neighbouring rows whose T (or P) brackets the dot and interpolates x and y linearly between them, so the liquid and vapor ends of the tie line always sit at the same T (or P).</p>
+    <p>In the two-phase region the page finds the two neighbouring rows whose T (or P) brackets the dot and interpolates x and y linearly between them, so the liquid and vapor ends of the tie line always sit at the same T (or P). With an azeotrope there are two such tie lines at some temperatures (or pressures), one on each side of it; the page uses the one that contains z.</p>
     <h3>Lever rule</h3>
     <div class="eq">L = (y − z) / (y − x) &nbsp;&nbsp;&nbsp; V = (z − x) / (y − x) = 1 − L</div>
     <p>L and V are moles of liquid and vapor per mole of mixture. On the plot, the <span class="c-vap">green dashed segment</span> from x to the dot has a length proportional to V, and the <span class="c-liq">blue dashed segment</span> from the dot to y has a length proportional to L.</p>
-    <h3>Spreadsheet layout read by Load .xlsx</h3>
-    <ul>
-      <li>Any sheet whose header row contains <code>VAPOR MOLEFRAC H2O</code>. The row below the header holds the units.</li>
-      <li>T-x-y sheets have <code>TOTAL TEMP</code> and are grouped by <code>PRES</code>. P-x-y sheets have <code>TOTAL PRES</code> and are grouped by <code>TEMP</code>.</li>
-      <li>Liquid composition comes from <code>LIQUID1 MOLEFRAC H2O</code>, or <code>MOLEFRAC H2O</code> if that column is missing. Other columns (K-values, activity coefficients, β) are ignored.</li>
-      <li>Units are shown as they appear in the file. In the original file the T-x-y pressures are in atm and the P-x-y pressures are in bar.</li>
-    </ul>
+    <h3>Azeotropes</h3>
+    <p>An azeotrope is where the bubble and dew curves touch inside the diagram (x = y). The page finds it where y − x changes sign between neighbouring rows, marks it with a diamond and lists its composition and temperature (or pressure) in the readout.</p>
   </div>
 </dialog>
 
 <dialog class="dlg" id="dlg-about" aria-labelledby="h-about">
   <div class="dlg-inner">
     <div class="dlg-head"><h2 id="h-about">About</h2><button type="button" class="dlg-x" data-close aria-label="Close">×</button></div>
-    <p>The layout and interaction follow the <a href="https://learncheme.github.io/demos/PxyAndTxyDiagramsForVLE/dist/index.html" target="_blank" rel="noopener">P-x-y and T-x-y Diagrams for VLE</a> simulation by LearnChemE (Department of Chemical and Biological Engineering, University of Colorado Boulder), whose simulations are open source in the <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank" rel="noopener">LearnChemE GitHub repository</a>. That simulation computes an ideal <i>n</i>-hexane/<i>n</i>-octane mixture with Raoult's law; this page replaces the model with tabulated methanol–water data.</p>
+    <p>The layout and interaction follow the <a href="https://learncheme.github.io/demos/PxyAndTxyDiagramsForVLE/dist/index.html" target="_blank" rel="noopener">P-x-y and T-x-y Diagrams for VLE</a> simulation by LearnChemE (Department of Chemical and Biological Engineering, University of Colorado Boulder), whose simulations are open source in the <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank" rel="noopener">LearnChemE GitHub repository</a>.</p>
     <p>The page is a single self-contained HTML file. The spreadsheet reader (SheetJS) loads only when you choose Load .xlsx.</p>
   </div>
 </dialog>
@@ -532,63 +554,84 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 (function () {
   'use strict';
 
-  // ---- Tabulated data (water mole fractions; v = T for T-x-y, P for P-x-y) ----
-  const SAMPLE = {"Txy":{"fixedUnit":"atm","varUnit":"C","series":[{"value":1,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.00804664,0.0160932,0.0241418,0.0321946,0.0402538,0.0483224,0.0564034,0.0645002,0.0726169,0.0807577,0.0889275,0.0971318,0.1053768,0.1136693,0.1220169,0.1304283,0.1389132,0.1474824,0.1561481,0.1649241,0.1738259,0.1828711,0.1920796,0.2014741,0.2110803,0.2209277,0.2310501,0.2414865,0.2522819,0.2634886,0.2751676,0.2873904,0.3002416,0.3138216,0.3282505,0.3436737,0.3602664,0.3782468,0.3978841,0.4195177,0.4435809,0.4706359,0.5014254,0.5369523,0.5786048,0.6283626,0.6891525,0.7654964,0.8647832,1],"v":[64.53476,64.83953,65.14636,65.45532,65.76649,66.07998,66.39589,66.71434,67.03547,67.35942,67.68636,68.01648,68.34997,68.68708,69.02806,69.3732,69.72283,70.07731,70.43704,70.8025,71.1742,71.55272,71.93873,72.33297,72.73629,73.14966,73.57417,74.01106,74.46177,74.92793,75.41141,75.91441,76.43941,76.98935,77.56763,78.17826,78.82597,79.51637,80.25618,81.05351,81.91824,82.86252,83.90148,85.05427,86.34547,87.80731,89.48299,91.43218,93.74018,96.5346,100.0178]},{"value":5,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.010542,0.0210226,0.0314428,0.0418038,0.0521071,0.0623544,0.072548,0.0826903,0.0927842,0.102833,0.1128406,0.1228112,0.1327499,0.1426622,0.1525547,0.1624346,0.17231,0.1821904,0.1920864,0.20201,0.2119748,0.2219965,0.2320926,0.2422836,0.2525926,0.263046,0.2736747,0.2845139,0.2956048,0.3069951,0.3187408,0.3309076,0.3435736,0.3568313,0.3707921,0.3855903,0.4013899,0.418393,0.436851,0.4570812,0.4794899,0.5046049,0.533126,0.5660014,0.6045492,0.6506594,0.7071457,0.7783968,0.8716773,1],"v":[111.9666,112.29,112.6165,112.9462,113.2792,113.6154,113.955,114.2981,114.6448,114.9952,115.3494,115.7075,116.0698,116.4363,116.8074,117.1833,117.5642,117.9504,118.3424,118.7406,119.1453,119.5573,119.9771,120.4055,120.8434,121.2916,121.7515,122.2242,122.7113,123.2147,123.7365,124.279,124.8452,125.4384,126.0628,126.7231,127.4249,128.1753,128.9825,129.8567,130.8104,131.8592,133.0226,134.3256,135.8008,137.4912,139.4552,141.7744,144.5677,148.0159,152.4133]},{"value":10,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0117162,0.0233376,0.0348646,0.0462982,0.0576396,0.06889,0.0800514,0.0911259,0.1021159,0.1130244,0.1238548,0.1346111,0.1452978,0.1559202,0.1664841,0.1769963,0.1874645,0.1978975,0.2083052,0.218699,0.2290917,0.2394982,0.2499352,0.2604219,0.2709805,0.2816362,0.2924183,0.3033607,0.3145027,0.3258901,0.3375766,0.3496256,0.362112,0.3751253,0.3887729,0.4031848,0.4185197,0.4349736,0.4527908,0.4722799,0.4938369,0.5179771,0.5453865,0.5769954,0.6141027,0.6585787,0.7132232,0.7824352,0.8735707,1],"v":[137.3276,137.6524,137.9811,138.3139,138.6508,138.9918,139.337,139.6866,140.0405,140.3989,140.7618,141.1295,141.5021,141.8796,142.2624,142.6506,143.0444,143.4443,143.8504,144.2633,144.6833,145.111,145.547,145.9921,146.4471,146.9129,147.3908,147.8821,148.3883,148.9113,149.4533,150.017,150.6053,151.2219,151.8711,152.5583,153.2895,154.0724,154.9163,155.8325,156.835,157.9414,159.174,160.5614,162.141,163.9626,166.0946,168.6331,171.7193,175.5711,180.5494]}]},"Pxy":{"fixedUnit":"C","varUnit":"bar","series":[{"value":100,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.00992805,0.0197784,0.0295533,0.039255,0.0488861,0.0584496,0.0679488,0.0773875,0.0867698,0.0961003,0.1053843,0.1146274,0.123836,0.1330172,0.1421789,0.15133,0.1604802,0.1696406,0.1788233,0.1880422,0.1973128,0.2066524,0.2160807,0.22562,0.2352955,0.2451363,0.2551752,0.2654504,0.2760056,0.2868918,0.2981684,0.3099051,0.3221844,0.3351041,0.3487818,0.3633595,0.3790102,0.3959474,0.4144374,0.4348161,0.4575143,0.4830925,0.5122949,0.5461304,0.5860022,0.6339209,0.6928732,0.7674959,0.8653985,1],"v":[3.52417,3.488815,3.453467,3.418127,3.382796,3.347475,3.312165,3.276863,3.241568,3.206276,3.170981,3.135678,3.100359,3.065013,3.029628,2.99419,2.958682,2.923083,2.88737,2.851516,2.815491,2.779258,2.742777,2.706002,2.66888,2.631351,2.593347,2.55479,2.515594,2.475658,2.43487,2.393104,2.350214,2.306036,2.260383,2.213047,2.163785,2.112323,2.05835,2.00151,1.941396,1.87754,1.80941,1.73639,1.657774,1.572745,1.480362,1.379533,1.268989,1.147254,1.012606]},{"value":120,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0109129,0.0217236,0.0324335,0.0430447,0.0535595,0.0639803,0.0743103,0.0845528,0.0947114,0.1047907,0.1147952,0.1247303,0.1346021,0.1444172,0.1541831,0.1639082,0.1736018,0.1832745,0.1929379,0.2026053,0.2122915,0.2220132,0.2317895,0.2416417,0.2515943,0.2616752,0.2719163,0.2823544,0.293032,0.3039983,0.3153111,0.3270379,0.3392588,0.3520688,0.3655822,0.3799369,0.3953016,0.411884,0.4299433,0.4498071,0.4718954,0.4967556,0.5251144,0.5579582,0.5966603,0.6431906,0.70048,0.7730862,0.8685063,1],"v":[6.376736,6.319036,6.261176,6.203162,6.145002,6.086702,6.028265,5.969695,5.910993,5.852159,5.79319,5.73408,5.674826,5.615412,5.555825,5.496047,5.436056,5.375823,5.315314,5.25449,5.193303,5.131699,5.06961,5.006964,4.943671,4.879632,4.814731,4.748833,4.681785,4.613411,4.543509,4.471848,4.398163,4.322148,4.243451,4.161677,4.076363,3.986979,3.892914,3.793464,3.687817,3.575032,3.454018,3.32351,3.182035,3.027874,2.859017,2.67311,2.467387,2.238585,1.982852]},{"value":140,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0118179,0.0235101,0.0350776,0.0465222,0.0578456,0.0690501,0.0801383,0.0911133,0.1019784,0.1127375,0.123395,0.1339561,0.1444262,0.1548117,0.1651196,0.175358,0.1855358,0.1956629,0.2057506,0.2158117,0.2258603,0.2359126,0.2459868,0.2561038,0.266287,0.2765636,0.2869643,0.2975248,0.3082863,0.3192968,0.330612,0.3422979,0.3544322,0.3671075,0.3804351,0.3945495,0.409615,0.4258347,0.4434619,0.4628169,0.4843109,0.5084801,0.5360377,0.5679525,0.6055754,0.6508475,0.7066627,0.7775329,0.8709037,1],"v":[10.84249,10.75419,10.66536,10.57601,10.48617,10.39584,10.30503,10.21377,10.12205,10.02989,9.93728,9.844234,9.750743,9.656799,9.562388,9.46749,9.372079,9.276119,9.179568,9.082369,8.984458,8.885754,8.78616,8.685565,8.583832,8.480807,8.376303,8.270108,8.161971,8.051601,7.938664,7.822767,7.70346,7.580217,7.452428,7.319401,7.180311,7.034203,6.879982,6.716363,6.541848,6.354687,6.152834,5.933888,5.695027,5.432924,5.143651,4.822552,4.464096,4.061691,3.607453]}]},"name":"Txy_Pxy_meoh_h2o.xlsx"};
+  // ---- Sample data: Aspen Plus binary analysis export (x, y = mole fraction of comps[0]) ----
+  const SAMPLE = {"name":"Txy_Pxy_meoh_h2o.xlsx","comps":["H2O","METHANOL"],"notes":[],"Txy":{"fixedUnit":"atm","varUnit":"C","series":[{"value":1,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.00804664,0.0160932,0.0241418,0.0321946,0.0402538,0.0483224,0.0564034,0.0645002,0.0726169,0.0807577,0.0889275,0.0971318,0.1053768,0.1136693,0.1220169,0.1304283,0.1389132,0.1474824,0.1561481,0.1649241,0.1738259,0.1828711,0.1920796,0.2014741,0.2110803,0.2209277,0.2310501,0.2414865,0.2522819,0.2634886,0.2751676,0.2873904,0.3002416,0.3138216,0.3282505,0.3436737,0.3602664,0.3782468,0.3978841,0.4195177,0.4435809,0.4706359,0.5014254,0.5369523,0.5786048,0.6283626,0.6891525,0.7654964,0.8647832,1],"v":[64.53476,64.83953,65.14636,65.45532,65.76649,66.07998,66.39589,66.71434,67.03547,67.35942,67.68636,68.01648,68.34997,68.68708,69.02806,69.3732,69.72283,70.07731,70.43704,70.8025,71.1742,71.55272,71.93873,72.33297,72.73629,73.14966,73.57417,74.01106,74.46177,74.92793,75.41141,75.91441,76.43941,76.98935,77.56763,78.17826,78.82597,79.51637,80.25618,81.05351,81.91824,82.86252,83.90148,85.05427,86.34547,87.80731,89.48299,91.43218,93.74018,96.5346,100.0178]},{"value":5,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.010542,0.0210226,0.0314428,0.0418038,0.0521071,0.0623544,0.072548,0.0826903,0.0927842,0.102833,0.1128406,0.1228112,0.1327499,0.1426622,0.1525547,0.1624346,0.17231,0.1821904,0.1920864,0.20201,0.2119748,0.2219965,0.2320926,0.2422836,0.2525926,0.263046,0.2736747,0.2845139,0.2956048,0.3069951,0.3187408,0.3309076,0.3435736,0.3568313,0.3707921,0.3855903,0.4013899,0.418393,0.436851,0.4570812,0.4794899,0.5046049,0.533126,0.5660014,0.6045492,0.6506594,0.7071457,0.7783968,0.8716773,1],"v":[111.9666,112.29,112.6165,112.9462,113.2792,113.6154,113.955,114.2981,114.6448,114.9952,115.3494,115.7075,116.0698,116.4363,116.8074,117.1833,117.5642,117.9504,118.3424,118.7406,119.1453,119.5573,119.9771,120.4055,120.8434,121.2916,121.7515,122.2242,122.7113,123.2147,123.7365,124.279,124.8452,125.4384,126.0628,126.7231,127.4249,128.1753,128.9825,129.8567,130.8104,131.8592,133.0226,134.3256,135.8008,137.4912,139.4552,141.7744,144.5677,148.0159,152.4133]},{"value":10,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0117162,0.0233376,0.0348646,0.0462982,0.0576396,0.06889,0.0800514,0.0911259,0.1021159,0.1130244,0.1238548,0.1346111,0.1452978,0.1559202,0.1664841,0.1769963,0.1874645,0.1978975,0.2083052,0.218699,0.2290917,0.2394982,0.2499352,0.2604219,0.2709805,0.2816362,0.2924183,0.3033607,0.3145027,0.3258901,0.3375766,0.3496256,0.362112,0.3751253,0.3887729,0.4031848,0.4185197,0.4349736,0.4527908,0.4722799,0.4938369,0.5179771,0.5453865,0.5769954,0.6141027,0.6585787,0.7132232,0.7824352,0.8735707,1],"v":[137.3276,137.6524,137.9811,138.3139,138.6508,138.9918,139.337,139.6866,140.0405,140.3989,140.7618,141.1295,141.5021,141.8796,142.2624,142.6506,143.0444,143.4443,143.8504,144.2633,144.6833,145.111,145.547,145.9921,146.4471,146.9129,147.3908,147.8821,148.3883,148.9113,149.4533,150.017,150.6053,151.2219,151.8711,152.5583,153.2895,154.0724,154.9163,155.8325,156.835,157.9414,159.174,160.5614,162.141,163.9626,166.0946,168.6331,171.7193,175.5711,180.5494]}]},"Pxy":{"fixedUnit":"C","varUnit":"bar","series":[{"value":100,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.00992805,0.0197784,0.0295533,0.039255,0.0488861,0.0584496,0.0679488,0.0773875,0.0867698,0.0961003,0.1053843,0.1146274,0.123836,0.1330172,0.1421789,0.15133,0.1604802,0.1696406,0.1788233,0.1880422,0.1973128,0.2066524,0.2160807,0.22562,0.2352955,0.2451363,0.2551752,0.2654504,0.2760056,0.2868918,0.2981684,0.3099051,0.3221844,0.3351041,0.3487818,0.3633595,0.3790102,0.3959474,0.4144374,0.4348161,0.4575143,0.4830925,0.5122949,0.5461304,0.5860022,0.6339209,0.6928732,0.7674959,0.8653985,1],"v":[3.52417,3.488815,3.453467,3.418127,3.382796,3.347475,3.312165,3.276863,3.241568,3.206276,3.170981,3.135678,3.100359,3.065013,3.029628,2.99419,2.958682,2.923083,2.88737,2.851516,2.815491,2.779258,2.742777,2.706002,2.66888,2.631351,2.593347,2.55479,2.515594,2.475658,2.43487,2.393104,2.350214,2.306036,2.260383,2.213047,2.163785,2.112323,2.05835,2.00151,1.941396,1.87754,1.80941,1.73639,1.657774,1.572745,1.480362,1.379533,1.268989,1.147254,1.012606]},{"value":120,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0109129,0.0217236,0.0324335,0.0430447,0.0535595,0.0639803,0.0743103,0.0845528,0.0947114,0.1047907,0.1147952,0.1247303,0.1346021,0.1444172,0.1541831,0.1639082,0.1736018,0.1832745,0.1929379,0.2026053,0.2122915,0.2220132,0.2317895,0.2416417,0.2515943,0.2616752,0.2719163,0.2823544,0.293032,0.3039983,0.3153111,0.3270379,0.3392588,0.3520688,0.3655822,0.3799369,0.3953016,0.411884,0.4299433,0.4498071,0.4718954,0.4967556,0.5251144,0.5579582,0.5966603,0.6431906,0.70048,0.7730862,0.8685063,1],"v":[6.376736,6.319036,6.261176,6.203162,6.145002,6.086702,6.028265,5.969695,5.910993,5.852159,5.79319,5.73408,5.674826,5.615412,5.555825,5.496047,5.436056,5.375823,5.315314,5.25449,5.193303,5.131699,5.06961,5.006964,4.943671,4.879632,4.814731,4.748833,4.681785,4.613411,4.543509,4.471848,4.398163,4.322148,4.243451,4.161677,4.076363,3.986979,3.892914,3.793464,3.687817,3.575032,3.454018,3.32351,3.182035,3.027874,2.859017,2.67311,2.467387,2.238585,1.982852]},{"value":140,"x":[0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1],"y":[0,0.0118179,0.0235101,0.0350776,0.0465222,0.0578456,0.0690501,0.0801383,0.0911133,0.1019784,0.1127375,0.123395,0.1339561,0.1444262,0.1548117,0.1651196,0.175358,0.1855358,0.1956629,0.2057506,0.2158117,0.2258603,0.2359126,0.2459868,0.2561038,0.266287,0.2765636,0.2869643,0.2975248,0.3082863,0.3192968,0.330612,0.3422979,0.3544322,0.3671075,0.3804351,0.3945495,0.409615,0.4258347,0.4434619,0.4628169,0.4843109,0.5084801,0.5360377,0.5679525,0.6055754,0.6508475,0.7066627,0.7775329,0.8709037,1],"v":[10.84249,10.75419,10.66536,10.57601,10.48617,10.39584,10.30503,10.21377,10.12205,10.02989,9.93728,9.844234,9.750743,9.656799,9.562388,9.46749,9.372079,9.276119,9.179568,9.082369,8.984458,8.885754,8.78616,8.685565,8.583832,8.480807,8.376303,8.270108,8.161971,8.051601,7.938664,7.822767,7.70346,7.580217,7.452428,7.319401,7.180311,7.034203,6.879982,6.716363,6.541848,6.354687,6.152834,5.933888,5.695027,5.432924,5.143651,4.822552,4.464096,4.061691,3.607453]}]}};
 
   const KIND = {
-    Txy: { label: 'T-x-y', fixedName: 'Pressure', fixedSym: 'P', varName: 'Temperature', varSym: 'T', liquidHigh: false, varDec: 1 },
-    Pxy: { label: 'P-x-y', fixedName: 'Temperature', fixedSym: 'T', varName: 'Pressure', varSym: 'P', liquidHigh: true, varDec: 2 }
+    Txy: { label: 'T-x-y', fixedQ: 'P', varQ: 'T', fixedName: 'Pressure', varName: 'Temperature', liquidHigh: false, word: 'isobar' },
+    Pxy: { label: 'P-x-y', fixedQ: 'T', varQ: 'P', fixedName: 'Temperature', varName: 'Pressure', liquidHigh: true, word: 'isotherm' }
   };
   const XLSX_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+
+  // ---- Units: file units -> canonical (K, bar) -> display units ----
+  const T_IN = { c: (v) => v + 273.15, k: (v) => v, f: (v) => (v - 32) * 5 / 9 + 273.15, r: (v) => v * 5 / 9 };
+  const P_IN = { bar: 1, atm: 1.01325, kpa: 0.01, pa: 1e-5, 'n/sqm': 1e-5, 'n/m2': 1e-5, mpa: 10, mbar: 1e-3, psi: 0.0689475729, psia: 0.0689475729, mmhg: 0.00133322368, torr: 0.00133322368, 'kg/sqcm': 0.980665, 'kgf/cm2': 0.980665 };
+  const P_GAUGE = { barg: 1, psig: 0.0689475729, kpag: 0.01 }; // Aspen gauge units are relative to 1 atm
+  const OUT = {
+    T: {
+      C: { label: '°C', f: (v) => v - 273.15, inv: (v) => v + 273.15, dec: 1 },
+      K: { label: 'K', f: (v) => v, inv: (v) => v, dec: 1 }
+    },
+    P: {
+      bar: { label: 'bar', f: (v) => v, inv: (v) => v, dec: 3 },
+      atm: { label: 'atm', f: (v) => v / 1.01325, inv: (v) => v * 1.01325, dec: 3 },
+      kPa: { label: 'kPa', f: (v) => v * 100, inv: (v) => v / 100, dec: 1 }
+    }
+  };
+  const ukey = (u) => String(u == null ? '' : u).trim().toLowerCase().replace(/\s+/g, '').replace(/^°/, '').replace(/^deg/, '');
+  function inConv(q, unit) {
+    const k = ukey(unit);
+    if (q === 'T') return T_IN[k] || null;
+    if (P_IN[k] != null) { const f = P_IN[k]; return (v) => v * f; }
+    if (P_GAUGE[k] != null) { const f = P_GAUGE[k]; return (v) => v * f + 1.01325; }
+    return null;
+  }
+  function rawLabel(u) {
+    const s = String(u == null ? '' : u).trim();
+    const k = ukey(s);
+    return k === 'c' ? '°C' : k === 'f' ? '°F' : k === 'r' ? '°R' : s;
+  }
+  const defaultUnit = (q, unit) => {
+    const k = ukey(unit);
+    if (q === 'T') return k === 'k' ? 'K' : 'C';
+    return k === 'atm' ? 'atm' : k === 'kpa' ? 'kPa' : 'bar';
+  };
+
+  // ---- Component names from Aspen component IDs ----
+  const COMP = {
+    'H2O': ['water', 'H₂O'], 'WATER': ['water', 'H₂O'],
+    'METHANOL': ['methanol', 'MeOH'], 'MEOH': ['methanol', 'MeOH'], 'CH3OH': ['methanol', 'MeOH'], 'CH4O': ['methanol', 'MeOH'],
+    'ETHANOL': ['ethanol', 'EtOH'], 'ETOH': ['ethanol', 'EtOH'], 'C2H5OH': ['ethanol', 'EtOH'],
+    '1-PROPANOL': ['1-propanol', 'PrOH'], 'N-PROPANOL': ['1-propanol', 'PrOH'], 'PROPANOL': ['1-propanol', 'PrOH'],
+    '2-PROPANOL': ['isopropanol', 'IPA'], 'ISOPROPANOL': ['isopropanol', 'IPA'], 'IPA': ['isopropanol', 'IPA'],
+    '1-BUTANOL': ['1-butanol', 'BuOH'], 'N-BUTANOL': ['1-butanol', 'BuOH'], 'BUTANOL': ['1-butanol', 'BuOH'],
+    'ACETONE': ['acetone', 'Ace'], 'ACETIC-ACID': ['acetic acid', 'AcOH'], 'ETHYL-ACETATE': ['ethyl acetate', 'EtOAc'],
+    'BENZENE': ['benzene', 'Bz'], 'TOLUENE': ['toluene', 'Tol'], 'CHLOROFORM': ['chloroform', 'CHCl₃'],
+    'N-PENTANE': ['n-pentane', 'C₅'], 'PENTANE': ['n-pentane', 'C₅'], 'N-HEXANE': ['n-hexane', 'C₆'], 'HEXANE': ['n-hexane', 'C₆'],
+    'N-HEPTANE': ['n-heptane', 'C₇'], 'HEPTANE': ['n-heptane', 'C₇'], 'N-OCTANE': ['n-octane', 'C₈'], 'OCTANE': ['n-octane', 'C₈'],
+    'CYCLOHEXANE': ['cyclohexane', 'cC₆'], 'ETHYLENE-GLYCOL': ['ethylene glycol', 'EG'], 'MEG': ['ethylene glycol', 'EG'],
+    'GLYCEROL': ['glycerol', 'Gly'], 'DME': ['dimethyl ether', 'DME'], 'DMC': ['dimethyl carbonate', 'DMC'], 'MEK': ['methyl ethyl ketone', 'MEK'],
+    'CO2': ['carbon dioxide', 'CO₂'], 'CO': ['carbon monoxide', 'CO'], 'H2': ['hydrogen', 'H₂'], 'N2': ['nitrogen', 'N₂'],
+    'O2': ['oxygen', 'O₂'], 'CH4': ['methane', 'CH₄'], 'NH3': ['ammonia', 'NH₃'], 'H2S': ['hydrogen sulfide', 'H₂S'], 'AR': ['argon', 'Ar']
+  };
+  function compInfo(ids) {
+    const info = ids.map((id) => {
+      const key = String(id).toUpperCase();
+      if (COMP[key]) return { id, name: COMP[key][0], abbr: COMP[key][1] };
+      const name = /\d/.test(id) ? String(id) : String(id).toLowerCase();
+      return { id, name, abbr: String(id).length <= 5 ? String(id) : null };
+    });
+    info.forEach((c) => { if (!c.abbr) c.abbr = c.name.replace(/[^A-Za-z]/g, '').charAt(0).toUpperCase() || '?'; });
+    if (info[0].abbr === info[1].abbr) { info[0].abbr = '1'; info[1].abbr = '2'; }
+    return info;
+  }
+  const cap = (s) => s.replace(/^((?:[0-9a-z]{1,2}-)?)([a-z])/, (m, p, c) => p + c.toUpperCase());
 
   const $ = (id) => document.getElementById(id);
   const clamp = (a, lo, hi) => Math.min(hi, Math.max(lo, a));
   const r1 = (n) => Math.round(n * 10) / 10;
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-  function unitLabel(u) {
-    if (u == null) return '';
-    const s = String(u).trim();
-    if (/^(c|deg ?c|°c|degc)$/i.test(s)) return '°C';
-    if (/^k$/i.test(s)) return 'K';
-    if (/^(f|deg ?f|°f)$/i.test(s)) return '°F';
-    return s;
-  }
   const fmtNum = (n) => String(+(+n).toPrecision(6));
-  const sep = () => ' ';
-
-  // ---- Data preparation ----
-  function prepare(raw) {
-    const d = { name: raw.name || 'data', kinds: {}, warnings: [] };
-    for (const k of ['Txy', 'Pxy']) {
-      const r = raw[k];
-      if (!r || !r.series || !r.series.length) continue;
-      const series = r.series.map((s) => {
-        const order = s.x.map((_, i) => i).sort((a, b) => s.x[a] - s.x[b]);
-        const x = order.map((i) => s.x[i]);
-        const y = order.map((i) => s.y[i]);
-        const v = order.map((i) => s.v[i]);
-        const dOrder = x.map((_, j) => j).sort((a, b) => y[a] - y[b]);
-        let mono = true;
-        for (let i = 1; i < v.length; i++) {
-          const a = Math.sign(v[i] - v[i - 1]);
-          const b = Math.sign(v[1] - v[0]);
-          if (a !== 0 && a !== b) { mono = false; break; }
-        }
-        return {
-          value: s.value, x, y, v,
-          bubX: x, bubV: v,
-          dewY: dOrder.map((j) => y[j]), dewV: dOrder.map((j) => v[j]),
-          vmin: Math.min(...v), vmax: Math.max(...v), mono
-        };
-      }).sort((a, b) => a.value - b.value);
-      series.forEach((s) => {
-        if (!s.mono) d.warnings.push(KIND[k].label + ' series ' + fmtNum(s.value) + ' is not monotone in ' + KIND[k].varSym + ' (azeotrope or noisy data); tie lines use the segment nearest the dot.');
-      });
-      d.kinds[k] = { fixedUnit: unitLabel(r.fixedUnit), varUnit: unitLabel(r.varUnit), series };
-    }
-    return d;
-  }
 
   function interp(xs, ys, q) {
     const n = xs.length;
@@ -600,15 +643,44 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     return dx === 0 ? ys[lo] : ys[lo] + (q - xs[lo]) / dx * (ys[hi] - ys[lo]);
   }
 
-  // Phase state at overall water fraction zw and T (or P) = v
-  function equilibrium(S, kind, zw, v) {
-    const vb = interp(S.bubX, S.bubV, zw);
-    const vd = interp(S.dewY, S.dewV, zw);
+  // ---- One series in display units: sort, dew-curve lookup, azeotropes ----
+  function prepSeries(s) {
+    const order = s.x.map((_, i) => i).sort((a, b) => s.x[a] - s.x[b]);
+    const x = order.map((i) => s.x[i]), y = order.map((i) => s.y[i]), v = order.map((i) => s.v[i]);
+    const n = x.length;
+    const dOrder = x.map((_, j) => j).sort((a, b) => y[a] - y[b]);
+    const az = [];
+    let prevI = -1, prevS = 0;
+    for (let i = 1; i < n - 1; i++) {
+      const d = y[i] - x[i];
+      const sg = d > 1e-7 ? 1 : d < -1e-7 ? -1 : 0;
+      if (!sg) continue;
+      if (prevS && sg !== prevS) {
+        const d0 = y[prevI] - x[prevI], f = d0 / (d0 - d);
+        az.push({ x: x[prevI] + f * (x[i] - x[prevI]), v: v[prevI] + f * (v[i] - v[prevI]) });
+      }
+      prevI = i; prevS = sg;
+    }
+    let turns = 0, dir = 0;
+    for (let i = 1; i < n; i++) {
+      const sg = Math.sign(v[i] - v[i - 1]);
+      if (sg && dir && sg !== dir) turns++;
+      if (sg) dir = sg;
+    }
+    return {
+      value: s.value, x, y, v, az, turns,
+      bubX: x, bubV: v, dewY: dOrder.map((j) => y[j]), dewV: dOrder.map((j) => v[j]),
+      vmin: Math.min(...v), vmax: Math.max(...v)
+    };
+  }
+
+  // Phase state at overall composition z0 (fraction of comps[0]) and T (or P) = v
+  function equilibrium(S, kind, z0, v) {
+    const vb = interp(S.bubX, S.bubV, z0);
+    const vd = interp(S.dewY, S.dewV, z0);
     const hi = KIND[kind].liquidHigh;
-    const isLiq = hi ? v >= vb : v <= vb;
-    const isVap = hi ? v <= vd : v >= vd;
-    if (isLiq) return { phase: 'liquid', x: zw, y: null, L: 1, V: 0, vb, vd };
-    if (isVap) return { phase: 'vapor', x: null, y: zw, L: 0, V: 1, vb, vd };
+    if (hi ? v >= vb : v <= vb) return { phase: 'liquid', x: z0, y: null, L: 1, V: 0, vb, vd };
+    if (hi ? v <= vd : v >= vd) return { phase: 'vapor', x: null, y: z0, L: 0, V: 1, vb, vd };
     let best = null, bestD = Infinity;
     for (let i = 0; i < S.v.length - 1; i++) {
       const v0 = S.v[i], v1 = S.v[i + 1];
@@ -618,13 +690,13 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
       const x = S.x[i] + f * (S.x[i + 1] - S.x[i]);
       const y = S.y[i] + f * (S.y[i + 1] - S.y[i]);
       const lo = Math.min(x, y), up = Math.max(x, y);
-      const dd = zw < lo ? lo - zw : zw > up ? zw - up : 0;
+      const dd = z0 < lo ? lo - z0 : z0 > up ? z0 - up : 0;
       if (dd < bestD) { bestD = dd; best = { x, y }; }
       if (dd === 0) break;
     }
-    if (!best) return { phase: 'liquid', x: zw, y: null, L: 1, V: 0, vb, vd };
+    if (!best) return { phase: 'liquid', x: z0, y: null, L: 1, V: 0, vb, vd };
     const span = best.y - best.x;
-    const L = Math.abs(span) < 1e-12 ? 0.5 : clamp((best.y - zw) / span, 0, 1);
+    const L = Math.abs(span) < 1e-12 ? 0.5 : clamp((best.y - z0) / span, 0, 1);
     return { phase: 'two', x: best.x, y: best.y, L, V: 1 - L, vb, vd };
   }
 
@@ -640,35 +712,56 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
   }
 
   // ---- State ----
-  let DATA = null;
-  const state = { diagram: 'Txy', idx: { Txy: 0, Pxy: 0 }, v: { Txy: null, Pxy: null }, zw: 0.5, comp: 'MeOH', axes: 'all', lock: 'free' };
+  let CANON = null; // data in K and bar
+  let DATA = null;  // data in display units
+  const state = {
+    diagram: 'Txy', idx: { Txy: 0, Pxy: 0 }, v: { Txy: null, Pxy: null }, z0: 0.5,
+    comp: 0, axes: 'all', lock: 'free', units: { T: 'C', P: 'bar' }
+  };
   let W = 600, H = 460, M = { l: 66, r: 18, t: 16, b: 50 }, PW = 500, PH = 400, DOM = { min: 0, max: 1, step: 0.2 };
 
   const svg = $('plot'), staticG = $('staticG'), tieG = $('tieG'), dot = $('dot'), dotRing = $('dotRing');
   const plotBox = $('plotBox'), barsBox = $('barsBox'), bars = $('bars');
 
   const cur = () => { const kind = state.diagram, K = DATA.kinds[kind]; return { kind, K, S: K.series[state.idx[kind]] }; };
-  const dc = (xw) => (state.comp === 'MeOH' ? 1 - xw : xw); // water basis <-> display basis (involution)
+  const dc = (x0) => (state.comp === 0 ? x0 : 1 - x0); // comps[0] basis <-> plotted component (involution)
   const sx = (c) => M.l + c * PW;
   const sy = (v) => M.t + (DOM.max - v) / (DOM.max - DOM.min) * PH;
   const invY = (py) => DOM.max - (py - M.t) / PH * (DOM.max - DOM.min);
-  const compName = () => (state.comp === 'MeOH' ? 'methanol' : 'water');
-  const compSub = () => (state.comp === 'MeOH' ? 'M' : 'W');
-  const fmtVar = (kind, v) => v.toFixed(KIND[kind].varDec) + sep(DATA.kinds[kind].varUnit) + DATA.kinds[kind].varUnit;
-  const fmtFixed = (kind, val) => fmtNum(val) + sep(DATA.kinds[kind].fixedUnit) + DATA.kinds[kind].fixedUnit;
+  const pc = () => CANON.comps[state.comp];
+  const fmtVar = (kind, v) => v.toFixed(DATA.kinds[kind].varDec) + ' ' + DATA.kinds[kind].varUnit;
+  const fmtFixed = (kind, val) => fmtNum(val) + ' ' + DATA.kinds[kind].fixedUnit;
+
+  function outFor(q) { return CANON.conv[q] ? OUT[q][state.units[q]] : null; }
+  function buildDisplay() {
+    const d = { kinds: {} };
+    for (const k of ['Txy', 'Pxy']) {
+      const C = CANON.kinds[k];
+      if (!C) continue;
+      const fo = outFor(KIND[k].fixedQ), vo = outFor(KIND[k].varQ);
+      const ff = fo ? fo.f : (a) => a, vf = vo ? vo.f : (a) => a;
+      d.kinds[k] = {
+        fixedUnit: fo ? fo.label : C.fixedRaw,
+        varUnit: vo ? vo.label : C.varRaw,
+        varDec: vo ? vo.dec : (KIND[k].varQ === 'T' ? 1 : 3),
+        series: C.series.map((s) => prepSeries({ value: ff(s.value), x: s.x, y: s.y, v: s.v.map(vf) }))
+      };
+    }
+    DATA = d;
+  }
 
   function domainFor(kind) {
     const K = DATA.kinds[kind];
     const list = state.axes === 'all' ? K.series : [K.series[state.idx[kind]]];
     const lo = Math.min(...list.map((s) => s.vmin)), hi = Math.max(...list.map((s) => s.vmax));
-    return niceDomain(lo, hi, kind === 'Pxy');
+    return niceDomain(lo, hi, KIND[kind].varQ === 'P');
   }
 
   function initV(kind) {
     const K = DATA.kinds[kind];
     if (!K) return;
     const S = K.series[state.idx[kind]];
-    const vb = interp(S.bubX, S.bubV, state.zw), vd = interp(S.dewY, S.dewV, state.zw);
+    const vb = interp(S.bubX, S.bubV, state.z0), vd = interp(S.dewY, S.dewV, state.z0);
     state.v[kind] = (vb + vd) / 2;
   }
 
@@ -686,8 +779,10 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     return d + 'Z';
   }
   function seriesLabel(kind, S, cls) {
-    let im = 0;
-    for (let i = 1; i < S.v.length; i++) if (S.v[i] > S.v[im]) im = i;
+    // label the pure-component end with the higher T (or P); switch ends if an azeotrope sits near it
+    const n = S.x.length;
+    let im = S.v[n - 1] > S.v[0] ? n - 1 : 0;
+    if (S.az.some((a) => Math.abs(a.x - S.x[im]) < 0.25)) im = im === 0 ? n - 1 : 0;
     const c = dc(S.x[im]);
     const left = c < 0.5;
     const px = sx(c) + (left ? 7 : -7);
@@ -705,12 +800,24 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     }
     return '';
   }
+  function azMarks(S) {
+    let s = '';
+    for (const a of S.az) {
+      const c = dc(a.x), ax = r1(sx(c)), ay = r1(sy(a.v));
+      const probe = clamp(a.x + (a.x < 0.5 ? 0.06 : -0.06), 0, 1);
+      const lensAbove = interp(S.bubX, S.bubV, probe) > a.v;
+      const ly = lensAbove ? ay + 19 : ay - 11;
+      const right = c > 0.6;
+      s += '<path class="az" d="M' + ax + ' ' + (ay - 6) + 'L' + (ax + 6) + ' ' + ay + 'L' + ax + ' ' + (ay + 6) + 'L' + (ax - 6) + ' ' + ay + 'Z"/>';
+      s += '<text class="az-label" x="' + (right ? ax - 4 : ax + 4) + '" y="' + ly + '" text-anchor="' + (right ? 'end' : 'start') + '">azeotrope</text>';
+    }
+    return s;
+  }
 
   function drawStatic() {
     const { kind, K, S } = cur();
     const x0 = M.l, x1 = M.l + PW, y0 = M.t, y1 = M.t + PH;
     let s = '';
-    // y grid and ticks
     const nT = Math.round((DOM.max - DOM.min) / DOM.step);
     const dec = Math.max(0, -Math.floor(Math.log10(DOM.step) + 1e-9));
     for (let i = 0; i <= nT; i++) {
@@ -724,7 +831,6 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
         s += '<line class="tick" x1="' + (x0 - 3) + '" x2="' + x0 + '" y1="' + ym + '" y2="' + ym + '"/>';
       }
     }
-    // x grid and ticks
     for (let i = 0; i <= 20; i++) {
       const c = i / 20, x = r1(sx(c)), major = i % 4 === 0;
       if (major && i > 0 && i < 20) s += '<line class="grid" x1="' + x + '" x2="' + x + '" y1="' + y0 + '" y2="' + y1 + '"/>';
@@ -732,7 +838,6 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
       if (major) s += '<text class="tl" x="' + x + '" y="' + (y1 + 19) + '" text-anchor="middle">' + c.toFixed(2) + '</text>';
     }
     s += '<rect class="frame" x="' + x0 + '" y="' + y0 + '" width="' + PW + '" height="' + PH + '"/>';
-    // curves
     s += '<g clip-path="url(#plotClip)">';
     if (state.axes === 'all') {
       K.series.forEach((T, j) => {
@@ -747,12 +852,11 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     s += '<polyline class="dew" points="' + ptsStr(S, 'dew') + '"/>';
     s += seriesLabel(kind, S, 'cur-label');
     s += '</g>';
-    // region labels
+    s += azMarks(S);
     const liqTop = KIND[kind].liquidHigh;
     s += regionLabel(kind, S, 'liquid', liqTop);
     s += regionLabel(kind, S, 'vapor', !liqTop);
-    // axis titles
-    s += '<text class="axt" x="' + r1((x0 + x1) / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + compName() + ' mole fraction</text>';
+    s += '<text class="axt" x="' + r1((x0 + x1) / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + esc(pc().name) + ' mole fraction</text>';
     s += '<text class="axt" transform="translate(15 ' + r1((y0 + y1) / 2) + ') rotate(-90)" text-anchor="middle" dominant-baseline="middle">' +
       KIND[kind].varName + ' (' + esc(K.varUnit) + ')</text>';
     staticG.innerHTML = s;
@@ -762,10 +866,10 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 
   // ---- Drawing: dynamic layer ----
   function drawDynamic() {
-    const { kind, K, S } = cur();
+    const { kind, S } = cur();
     const v = state.v[kind];
-    const eq = equilibrium(S, kind, state.zw, v);
-    const zx = r1(sx(dc(state.zw))), vy = r1(sy(v)), base = M.t + PH;
+    const eq = equilibrium(S, kind, state.z0, v);
+    const zx = r1(sx(dc(state.z0))), vy = r1(sy(v)), base = M.t + PH;
     let h = '';
     if (eq.phase === 'two') {
       const X = r1(sx(dc(eq.x))), Y = r1(sx(dc(eq.y)));
@@ -778,23 +882,24 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     }
     tieG.innerHTML = h;
     for (const el of [dot, dotRing]) { el.setAttribute('cx', zx); el.setAttribute('cy', vy); }
-    dot.setAttribute('aria-valuetext', compName() + ' fraction ' + dc(state.zw).toFixed(3) + ', ' + KIND[kind].varSym + ' ' + fmtVar(kind, v) + ', ' + eq.phase);
+    dot.setAttribute('aria-valuetext', pc().name + ' fraction ' + dc(state.z0).toFixed(3) + ', ' + KIND[kind].varQ + ' ' + fmtVar(kind, v) + ', ' + eq.phase);
 
-    // readout
     $('mixV').textContent = fmtVar(kind, v);
-    $('mixFixed').textContent = KIND[kind].fixedSym + ' = ' + fmtFixed(kind, S.value) + ' (fixed)';
+    $('mixFixed').textContent = KIND[kind].fixedQ + ' = ' + fmtFixed(kind, S.value) + ' (fixed)';
     const chip = $('phaseChip');
     chip.dataset.phase = eq.phase;
     chip.querySelector('.l').hidden = eq.phase === 'vapor';
     chip.querySelector('.v').hidden = eq.phase === 'liquid';
     $('phaseText').textContent = eq.phase === 'two' ? 'Liquid + vapor' : eq.phase === 'liquid' ? 'Liquid' : 'Vapor';
-    $('r-z').textContent = dc(state.zw).toFixed(3);
+    $('r-z').textContent = dc(state.z0).toFixed(3);
     $('r-x').textContent = eq.x == null ? '–' : dc(eq.x).toFixed(3);
     $('r-y').textContent = eq.y == null ? '–' : dc(eq.y).toFixed(3);
     $('r-L').textContent = eq.L.toFixed(3) + ' mol';
     $('r-V').textContent = eq.V.toFixed(3) + ' mol';
     $('r-vb').textContent = fmtVar(kind, eq.vb);
     $('r-vd').textContent = fmtVar(kind, eq.vd);
+    $('r-az-row').hidden = !S.az.length;
+    $('r-az').textContent = S.az.map((a) => dc(a.x).toFixed(3) + ' at ' + fmtVar(kind, a.v)).join('; ');
     drawBars(eq);
   }
 
@@ -815,7 +920,7 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     s += '<line class="tick" x1="' + m.l + '" x2="' + (Wb - m.r) + '" y1="' + (m.t + ph) + '" y2="' + (m.t + ph) + '"/>';
     const bw = Math.min(70, pw * 0.3);
     const c1 = m.l + pw * 0.3, c2 = m.l + pw * 0.72;
-    const sub = compSub();
+    const sub = esc(pc().abbr);
     const lab = (cx, top, sym, val) =>
       '<text class="bar-lab" x="' + r1(cx) + '" y="' + r1(top - 7) + '" text-anchor="middle">' + sym +
       '<tspan dy="3" font-size="9.5">' + sub + '</tspan><tspan dy="-3"> = ' + val.toFixed(2) + '</tspan></text>';
@@ -850,6 +955,14 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
 
   // ---- Controls ----
   const slider = $('seriesSlider'), ticks = $('seriesTicks');
+
+  function buildCompSeg() {
+    const order = [CANON.vol, 1 - CANON.vol];
+    $('compSeg').innerHTML = order.map((i) =>
+      '<input type="radio" name="comp" id="cp-' + i + '" value="' + i + '"' + (i === state.comp ? ' checked' : '') + '>' +
+      '<label for="cp-' + i + '">' + esc(cap(CANON.comps[i].name)) + '</label>').join('');
+  }
+
   function syncControls() {
     const { kind, K, S } = cur();
     $('seriesName').textContent = KIND[kind].fixedName;
@@ -871,19 +984,26 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
       ticks.appendChild(b);
     });
     $('seriesValue').textContent = fmtFixed(kind, S.value);
-    $('lk-v-label').textContent = 'Constant ' + KIND[kind].varSym;
-    $('hint').innerHTML = 'Drag the dot or click the plot. Hold <kbd>Shift</kbd> to keep ' + KIND[kind].varSym +
+    $('lk-v-label').textContent = 'Constant ' + KIND[kind].varQ;
+    $('hint').innerHTML = 'Drag the dot or click the plot. Hold <kbd>Shift</kbd> to keep ' + KIND[kind].varQ +
       ' constant, <kbd>Ctrl</kbd> to keep composition constant.';
     $('r-vb-l').textContent = (kind === 'Txy' ? 'Bubble T' : 'Bubble P') + ' at z';
     $('r-vd-l').textContent = (kind === 'Txy' ? 'Dew T' : 'Dew P') + ' at z';
-    document.querySelectorAll('.csub').forEach((el) => { el.textContent = compSub(); });
-    $('compSubNote').textContent = compSub() + ' = ' + compName();
+    document.querySelectorAll('.csub').forEach((el) => { el.textContent = pc().abbr; });
+    $('compSubNote').textContent = pc().abbr + ' = ' + pc().name;
     for (const k of ['Txy', 'Pxy']) {
       const el = $('dg-' + k);
       el.disabled = !DATA.kinds[k];
       el.checked = k === kind;
     }
-    svg.setAttribute('aria-label', KIND[kind].label + ' diagram of methanol and water at ' + KIND[kind].fixedSym + ' = ' + fmtFixed(kind, S.value));
+    for (const q of ['T', 'P']) {
+      document.querySelectorAll('input[name="u' + q + '"]').forEach((el) => {
+        el.disabled = !CANON.conv[q];
+        el.checked = CANON.conv[q] && el.value === state.units[q];
+      });
+    }
+    const names = CANON.comps.map((c) => c.name);
+    svg.setAttribute('aria-label', KIND[kind].label + ' diagram of ' + names.join(' and ') + ' at ' + KIND[kind].fixedQ + ' = ' + fmtFixed(kind, S.value));
   }
 
   function setSeries(i) {
@@ -891,7 +1011,6 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     i = clamp(Math.round(i), 0, K.series.length - 1);
     if (i === state.idx[kind]) return;
     if (state.axes === 'one') {
-      // keep the dot at the same relative height when the axes refit
       const old = DOM, frac = (state.v[kind] - old.min) / (old.max - old.min);
       state.idx[kind] = i;
       const nd = domainFor(kind);
@@ -903,6 +1022,19 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     redraw();
   }
 
+  function setUnit(q, u) {
+    if (!CANON.conv[q] || state.units[q] === u || !OUT[q][u]) return;
+    const o = OUT[q][state.units[q]], n = OUT[q][u];
+    for (const k of ['Txy', 'Pxy']) {
+      if (DATA.kinds[k] && KIND[k].varQ === q && state.v[k] != null) state.v[k] = n.f(o.inv(state.v[k]));
+    }
+    state.units[q] = u;
+    buildDisplay();
+    syncControls();
+    $('dataSummary').textContent = summary();
+    redraw();
+  }
+
   slider.addEventListener('input', () => setSeries(+slider.value));
   ticks.addEventListener('click', (e) => { const b = e.target.closest('.tickbtn'); if (b) setSeries(+b.dataset.i); });
   document.querySelectorAll('input[name="diagram"]').forEach((el) => el.addEventListener('change', () => {
@@ -911,9 +1043,12 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     syncControls();
     redraw();
   }));
-  document.querySelectorAll('input[name="comp"]').forEach((el) => el.addEventListener('change', () => {
-    state.comp = el.value; syncControls(); redraw();
-  }));
+  $('compSeg').addEventListener('change', (e) => {
+    if (e.target.name !== 'comp') return;
+    state.comp = +e.target.value;
+    syncControls();
+    redraw();
+  });
   document.querySelectorAll('input[name="axes"]').forEach((el) => el.addEventListener('change', () => {
     state.axes = el.value;
     const kind = state.diagram;
@@ -922,6 +1057,8 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     redraw();
   }));
   document.querySelectorAll('input[name="lock"]').forEach((el) => el.addEventListener('change', () => { state.lock = el.value; }));
+  document.querySelectorAll('input[name="uT"]').forEach((el) => el.addEventListener('change', () => setUnit('T', el.value)));
+  document.querySelectorAll('input[name="uP"]').forEach((el) => el.addEventListener('change', () => setUnit('P', el.value)));
 
   // ---- Pointer and keyboard ----
   let drag = null;
@@ -933,7 +1070,7 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
     const kind = state.diagram;
     const lockV = e.shiftKey || state.lock === 'v';
     const lockZ = e.ctrlKey || e.metaKey || state.lock === 'z';
-    if (!lockZ) state.zw = dc(clamp((p.x - M.l) / PW, 0, 1));
+    if (!lockZ) state.z0 = dc(clamp((p.x - M.l) / PW, 0, 1));
     if (!lockV) state.v[kind] = clamp(invY(p.y), DOM.min, DOM.max);
     drawDynamic();
   }
@@ -957,14 +1094,14 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
   dot.addEventListener('keydown', (e) => {
     const kind = state.diagram, big = e.shiftKey ? 5 : 1;
     const dz = 0.01 * big, dv = (DOM.max - DOM.min) / 100 * big;
-    let c = dc(state.zw), v = state.v[kind];
+    let c = dc(state.z0), v = state.v[kind];
     if (e.key === 'ArrowLeft') c -= dz;
     else if (e.key === 'ArrowRight') c += dz;
     else if (e.key === 'ArrowUp') v += dv;
     else if (e.key === 'ArrowDown') v -= dv;
     else return;
     e.preventDefault();
-    state.zw = dc(clamp(c, 0, 1));
+    state.z0 = dc(clamp(c, 0, 1));
     state.v[kind] = clamp(v, DOM.min, DOM.max);
     drawDynamic();
   });
@@ -979,37 +1116,78 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
   });
 
   // ---- Data loading ----
-  function summary(d) {
-    const parts = [];
-    const lab = { Txy: ['T-x-y', 'isobar'], Pxy: ['P-x-y', 'isotherm'] };
+  function summary() {
+    const parts = [[CANON.comps[CANON.vol], CANON.comps[1 - CANON.vol]].map((c) => c.name).join(' + ')];
     let nmin = Infinity, nmax = 0;
     for (const k of ['Txy', 'Pxy']) {
-      const K = d.kinds[k];
+      const K = DATA.kinds[k];
       if (!K) continue;
       const n = K.series.length;
-      parts.push(lab[k][0] + ': ' + n + ' ' + lab[k][1] + (n === 1 ? '' : 's') + ' (' + K.series.map((s) => fmtNum(s.value)).join(', ') + sep(K.fixedUnit) + K.fixedUnit + ')');
+      parts.push(KIND[k].label + ': ' + n + ' ' + KIND[k].word + (n === 1 ? '' : 's') + ' (' + K.series.map((s) => fmtNum(s.value)).join(', ') + ' ' + K.fixedUnit + ')');
       K.series.forEach((s) => { nmin = Math.min(nmin, s.x.length); nmax = Math.max(nmax, s.x.length); });
     }
     parts.push((nmin === nmax ? nmin : nmin + '–' + nmax) + ' points per series');
     return '· ' + parts.join(' · ');
   }
 
+  // raw: { name, comps:[id0,id1], notes:[], Txy:{fixedUnit,varUnit,series:[{value,x,y,v}]}, Pxy:{...} }, x and y = fraction of id0
   function loadData(raw, isSample) {
-    const d = prepare(raw);
-    if (!d.kinds.Txy && !d.kinds.Pxy) throw new Error('No T-x-y or P-x-y series were found in the file.');
-    DATA = d;
+    const conv = { T: true, P: true };
+    const avail = ['Txy', 'Pxy'].filter((k) => raw[k] && raw[k].series && raw[k].series.length);
+    if (!avail.length) throw new Error('No T-x-y or P-x-y series were found in the file.');
+    const warnings = (raw.notes || []).slice();
+    for (const k of avail) {
+      for (const [q, u] of [[KIND[k].fixedQ, raw[k].fixedUnit], [KIND[k].varQ, raw[k].varUnit]]) {
+        if (!inConv(q, u)) {
+          if (conv[q]) warnings.push((q === 'T' ? 'Temperature' : 'Pressure') + ' unit "' + u + '" is not recognised, so values are shown as in the file and the ' + (q === 'T' ? 'temperature' : 'pressure') + ' unit cannot be changed.');
+          conv[q] = false;
+        }
+      }
+    }
+    const kinds = {};
+    for (const k of avail) {
+      const r = raw[k], fq = KIND[k].fixedQ, vq = KIND[k].varQ;
+      const fIn = conv[fq] ? inConv(fq, r.fixedUnit) : (a) => a;
+      const vIn = conv[vq] ? inConv(vq, r.varUnit) : (a) => a;
+      kinds[k] = {
+        fixedRaw: rawLabel(r.fixedUnit), varRaw: rawLabel(r.varUnit),
+        series: r.series.map((s) => ({ value: fIn(s.value), x: s.x.slice(), y: s.y.slice(), v: s.v.map(vIn) })).sort((a, b) => a.value - b.value)
+      };
+    }
+    // more volatile component: lower boiling T (T-x-y) or higher vapour pressure (P-x-y)
+    const k0 = avail[0], S0 = kinds[k0].series[0];
+    let iMax = 0, iMin = 0;
+    S0.x.forEach((a, i) => { if (a > S0.x[iMax]) iMax = i; if (a < S0.x[iMin]) iMin = i; });
+    const vBasis = S0.v[iMax], vOther = S0.v[iMin];
+    const basisLighter = k0 === 'Txy' ? vBasis < vOther : vBasis > vOther;
+    CANON = { name: raw.name || 'data', comps: compInfo(raw.comps || ['1', '2']), conv, kinds, vol: basisLighter ? 0 : 1 };
+
+    state.units.T = defaultUnit('T', raw.Pxy ? raw.Pxy.fixedUnit : raw.Txy.varUnit);
+    state.units.P = defaultUnit('P', raw.Txy ? raw.Txy.fixedUnit : raw.Pxy.varUnit);
+    state.comp = CANON.vol;
+    state.z0 = 0.5;
+    buildDisplay();
     for (const k of ['Txy', 'Pxy']) {
-      if (!d.kinds[k]) { state.v[k] = null; continue; }
-      state.idx[k] = clamp(state.idx[k], 0, d.kinds[k].series.length - 1);
+      if (!DATA.kinds[k]) { state.v[k] = null; continue; }
+      state.idx[k] = 0;
       initV(k);
     }
-    if (!d.kinds[state.diagram]) state.diagram = d.kinds.Txy ? 'Txy' : 'Pxy';
-    $('dataName').textContent = d.name;
-    $('dataSummary').textContent = summary(d);
+    if (!DATA.kinds[state.diagram]) state.diagram = DATA.kinds.Txy ? 'Txy' : 'Pxy';
+    for (const k of avail) {
+      DATA.kinds[k].series.forEach((s) => {
+        if (s.turns && !s.az.length) warnings.push(KIND[k].label + ' at ' + fmtFixed(k, s.value) + ': ' + KIND[k].varQ + ' rises and falls along the curve without an azeotrope (possibly noisy data); tie lines use the segment that contains the dot.');
+      });
+    }
+    const pair = [CANON.comps[CANON.vol], CANON.comps[1 - CANON.vol]].map((c) => cap(c.name));
+    $('title').textContent = pair.join('–') + ' VLE Diagrams';
+    $('dataName').textContent = CANON.name;
+    $('dataSummary').textContent = summary();
     $('restoreBtn').hidden = !!isSample;
+    $('warn').textContent = warnings.join(' ');
+    buildCompSeg();
     syncControls();
     layout(true);
-    return d;
+    return CANON;
   }
 
   function ensureXLSX() {
@@ -1024,56 +1202,77 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
   }
 
   function parseWorkbook(wb) {
-    const out = {};
     const norm = (c) => (typeof c === 'string' ? c.trim().toUpperCase().replace(/\s+/g, ' ') : '');
+    const found = [], notes = [];
     for (const name of wb.SheetNames) {
       const rows = window.XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: null });
-      const hi = rows.findIndex((r) => Array.isArray(r) && r.some((c) => norm(c) === 'VAPOR MOLEFRAC H2O'));
+      const hi = rows.findIndex((r) => Array.isArray(r) && r.some((c) => /^VAPOR MOLEFRAC \S/.test(norm(c))));
       if (hi < 0) continue;
       const H = rows[hi].map(norm);
       const col = (n) => H.indexOf(n);
-      let kind = null;
-      if (col('TOTAL TEMP') >= 0) kind = 'Txy';
-      else if (col('TOTAL PRES') >= 0) kind = 'Pxy';
-      if (!kind || out[kind]) continue;
+      const ids = [];
+      H.forEach((h) => { const m = h.match(/^VAPOR MOLEFRAC (.+)$/); if (m) ids.push(m[1]); });
+      if (ids.length !== 2) throw new Error('Sheet "' + name + '" has ' + ids.length + ' components. This page needs a binary (2-component) analysis.');
+      const kind = col('TOTAL TEMP') >= 0 ? 'Txy' : col('TOTAL PRES') >= 0 ? 'Pxy' : null;
+      if (!kind) { notes.push('Sheet "' + name + '" has no TOTAL TEMP or TOTAL PRES column and was skipped.'); continue; }
+      if (found.some((f) => f.kind === kind)) { notes.push('Sheet "' + name + '" is a second ' + KIND[kind].label + ' table and was skipped.'); continue; }
       const iv = col(kind === 'Txy' ? 'TOTAL TEMP' : 'TOTAL PRES');
       let iF = col(kind === 'Txy' ? 'PRES' : 'TEMP');
       if (iF < 0) iF = 0;
-      let ix = col('LIQUID1 MOLEFRAC H2O');
-      if (ix < 0) ix = col('MOLEFRAC H2O');
-      const iy = col('VAPOR MOLEFRAC H2O');
-      if (ix < 0) throw new Error('Sheet "' + name + '" has no LIQUID1 MOLEFRAC H2O or MOLEFRAC H2O column.');
+      // composition basis: the component in Aspen's plain MOLEFRAC column
+      let basis = null;
+      H.forEach((h) => { const m = h.match(/^MOLEFRAC (.+)$/); if (m && !basis && ids.includes(m[1])) basis = m[1]; });
+      if (!basis) basis = ids[0];
+      let ix = col('LIQUID1 MOLEFRAC ' + basis);
+      if (ix < 0) ix = col('LIQUID MOLEFRAC ' + basis);
+      if (ix < 0) ix = col('MOLEFRAC ' + basis);
+      const iy = col('VAPOR MOLEFRAC ' + basis);
+      if (ix < 0) throw new Error('Sheet "' + name + '" has no liquid mole fraction column for ' + basis + '.');
+      const iL2 = col('LIQUID2 MOLEFRAC ' + basis);
       const unitsRow = rows[hi + 1] || [];
       const hasUnits = typeof unitsRow[iF] === 'string' || typeof unitsRow[iv] === 'string';
       const groups = new Map();
+      let l2 = 0;
       for (let r = hi + 1; r < rows.length; r++) {
         const row = rows[r];
         if (!row) continue;
         const f = row[iF], x = row[ix], y = row[iy], v = row[iv];
         if ([f, x, y, v].some((a) => typeof a !== 'number' || !isFinite(a))) continue;
+        if (iL2 >= 0 && typeof row[iL2] === 'number') l2++;
         if (!groups.has(f)) groups.set(f, { value: f, x: [], y: [], v: [] });
         const g = groups.get(f);
         g.x.push(x); g.y.push(y); g.v.push(v);
       }
       const series = [...groups.values()].filter((g) => g.x.length >= 2);
       if (!series.length) throw new Error('Sheet "' + name + '" has a header row but no numeric data rows.');
-      out[kind] = {
-        fixedUnit: hasUnits ? unitsRow[iF] : '',
-        varUnit: hasUnits ? unitsRow[iv] : '',
-        series
-      };
+      if (l2) notes.push(KIND[kind].label + ': ' + l2 + ' rows have a second liquid phase (LIQUID2); the page draws only vapor–liquid equilibrium from LIQUID1.');
+      if (!hasUnits) notes.push(KIND[kind].label + ': no units row under the header, so °C and bar are assumed.');
+      found.push({
+        kind, ids, basis, series,
+        fixedUnit: hasUnits ? unitsRow[iF] : (kind === 'Txy' ? 'bar' : 'C'),
+        varUnit: hasUnits ? unitsRow[iv] : (kind === 'Txy' ? 'C' : 'bar')
+      });
     }
-    if (!out.Txy && !out.Pxy) {
-      throw new Error('No sheet with a VAPOR MOLEFRAC H2O column and a TOTAL TEMP or TOTAL PRES column was found. The file needs the same column headers as the original export.');
+    if (!found.length) {
+      throw new Error('No Aspen Plus binary analysis table was found. Paste the full Txy or Pxy results, including the header row with the VAPOR MOLEFRAC and TOTAL TEMP or TOTAL PRES columns.');
+    }
+    const ref = found[0];
+    const comps = [ref.basis, ref.ids.find((i) => i !== ref.basis)];
+    const out = { comps, notes };
+    for (const f of found) {
+      if (!f.ids.includes(comps[0]) || !f.ids.includes(comps[1])) {
+        throw new Error('The sheets describe different components (' + ref.ids.join(', ') + ' and ' + f.ids.join(', ') + '). Use one binary pair per file.');
+      }
+      const flip = f.basis !== comps[0];
+      out[f.kind] = {
+        fixedUnit: f.fixedUnit, varUnit: f.varUnit,
+        series: f.series.map((s) => (flip ? { value: s.value, x: s.x.map((a) => 1 - a), y: s.y.map((a) => 1 - a), v: s.v } : s))
+      };
     }
     return out;
   }
 
-  function setStatus(msg, isErr) {
-    const el = $('status');
-    el.textContent = msg || '';
-    el.classList.toggle('err', !!isErr);
-  }
+  function setStatus(msg) { $('status').textContent = msg || ''; }
 
   $('fileInput').addEventListener('change', async (e) => {
     const f = e.target.files && e.target.files[0];
@@ -1085,14 +1284,15 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
       const wb = window.XLSX.read(buf, { type: 'array' });
       const raw = parseWorkbook(wb);
       raw.name = f.name;
-      const d = loadData(raw, false);
-      setStatus('Loaded ' + f.name + '.' + (d.warnings.length ? ' ' + d.warnings.join(' ') : ''), d.warnings.length > 0);
+      const C = loadData(raw, false);
+      setStatus('Loaded ' + f.name + ': ' + [C.comps[C.vol], C.comps[1 - C.vol]].map((c) => c.name + ' (' + c.id + ')').join(' and ') + '.');
     } catch (err) {
-      setStatus((err && err.message) || 'The file could not be read.', true);
+      setStatus('');
+      $('warn').textContent = (err && err.message) || 'The file could not be read.';
     }
     e.target.value = '';
   });
-  $('restoreBtn').addEventListener('click', () => { loadData(SAMPLE, true); setStatus('Restored ' + SAMPLE.name + '.'); });
+  $('restoreBtn').addEventListener('click', () => { loadData(SAMPLE, true); setStatus('Restored the sample data (' + SAMPLE.name + ').'); });
 
   // ---- Boot ----
   loadData(SAMPLE, true);
@@ -1101,7 +1301,7 @@ dialog.dlg::backdrop { background: rgba(10, 14, 20, 0.45); }
   } else {
     window.addEventListener('resize', () => layout(false));
   }
-  window.__vle = { state, equilibrium, cur, get DATA() { return DATA; } };
+  window.__vle = { state, equilibrium, cur, get DATA() { return DATA; }, get CANON() { return CANON; } };
 })();
 </script>
 
